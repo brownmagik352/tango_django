@@ -1,7 +1,13 @@
 # Django settings for tango_with_django_project project.
+import os
+SETTINGS_DIR = os.path.dirname(__file__)
+PROJECT_PATH = os.path.abspath(os.path.join(SETTINGS_DIR, os.pardir))
+TEMPLATE_PATH = os.path.join(PROJECT_PATH, 'templates')
+STATIC_PATH = os.path.join(PROJECT_PATH, 'static')
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -50,12 +56,12 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://example.com/media/", "http://media.example.com/"
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -69,6 +75,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
+    STATIC_PATH,
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -111,6 +118,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    TEMPLATE_PATH,
 )
 
 INSTALLED_APPS = (
