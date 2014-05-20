@@ -4,6 +4,12 @@ from django.shortcuts import render_to_response
 from rango.models import Category, Page
 from rango.forms import CategoryForm
 
+def encode_url(str):
+	return str.replace(' ', '_')
+
+def decode_url(str):
+	return str.replace('_', ' ')
+
 def index(request):
 	context = RequestContext(request)
 	category_list = Category.objects.order_by('-likes')[:5]
@@ -11,7 +17,7 @@ def index(request):
 	context_dict = { 'categories': category_list, 'pages':page_list}
 
 	for category in category_list:
-		category.url = category.name.replace(' ', '_')
+		category.url = encode_url(category.name)
 
 	return render_to_response('rango/index.html', context_dict, context)
 
@@ -22,7 +28,7 @@ def about(request):
 
 def category(request, category_name_url):
 	context = RequestContext(request)
-	category_name = category_name_url.replace('_',' ')
+	category_name = decode_url(category_name_url)
 
 	context_dict = {'category_name': category_name}
 
