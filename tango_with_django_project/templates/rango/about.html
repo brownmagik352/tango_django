@@ -5,9 +5,13 @@
 {% block title %}About{% endblock %}
 
 {% block body_block %}
-   <h1>About Rango</h1>
-   <h3>You have visited this site {{ visits }} times.</h3>
-	Rango is a nice feller. He built this {{thing}}!
-	<img src="{% static 'wenzel_app.jpg' %}" alt="food_pic"/>
-	<br />
+<div class="hero-unit">
+    <h1>About Rango</h1>
+    This is <strong>Rango's about page</strong>.<br />
+
+    You've visited the site on <strong>{{ visit_count }} occasion(s)</strong>.<br />
+
+    Here's a picture of Rango!<br />
+    <img src="{% static 'rango.jpeg' %}" alt="Picture of Rango" />
+</div>
 {% endblock %}
