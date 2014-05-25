@@ -63,3 +63,9 @@ def run_query(search_terms):
 
     # Return the list of results to the calling function.
     return results
+
+if __name__ == "__main__":
+	query = raw_input("Search Query: ")
+	results = run_query(query)
+	for i in range(10):
+		print "%d. %s\n%s" % (i+1, results[i]['title'], results[i]['link'])
