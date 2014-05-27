@@ -8,6 +8,14 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from rango.bing_search import run_query
 
+def get_category_list():
+    cat_list = Category.objects.all()
+
+    for cat in cat_list:
+        cat.url = encode_url(cat.name)
+
+    return cat_list
+
 def encode_url(str):
 	return str.replace(' ', '_')
 
@@ -17,14 +25,10 @@ def decode_url(str):
 def index(request):
 	context = RequestContext(request)
 
-	category_list = Category.objects.all()
-	context_dict = {'categories': category_list}
-
-	for category in category_list:
-	   category.url = encode_url(category.name)
-
+	cat_list = get_category_list()
+	top_categories = cat_list.order_by('-views')[:5]
 	page_list = Page.objects.order_by('-views')[:5]
-	context_dict['pages'] = page_list
+	context_dict = {"cat_list":cat_list, "pages": page_list, "categories":top_categories}
 
 	if request.session.get('last_visit'):
 	    # The session has a value for the last visit
@@ -50,6 +54,10 @@ def about(request):
 	else:
 		count = 0
 	context_dict['visits'] = count
+
+	cat_list = get_category_list()
+	context_dict['cat_list'] = cat_list
+
 	return render_to_response('rango/about.html', context_dict, context)
 
 def category(request, category_name_url):
@@ -66,11 +74,14 @@ def category(request, category_name_url):
 	except Category.DoesNotExist:
 		pass
 	
+	cat_list = get_category_list()
+	context_dict['cat_list'] = cat_list
 	return render_to_response('rango/category.html', context_dict, context)
 
 @login_required
 def add_category(request):
 	context = RequestContext(request)
+	cat_list = get_category_list()
 
 	if request.method == 'POST':
 		form = CategoryForm(request.POST)
@@ -84,7 +95,7 @@ def add_category(request):
 	else:
 		form = CategoryForm()
 
-	return render_to_response('rango/add_category.html', {'form':form}, context)
+	return render_to_response('rango/add_category.html', {'form':form, 'cat_list': cat_list}, context)
 
 @login_required
 def add_page(request, category_name_url):
@@ -122,10 +133,11 @@ def add_page(request, category_name_url):
     else:
         form = PageForm()
 
+    cat_list = get_category_list()
+    context_dict = {'category_name_url': category_name_url,
+             'category_name': category_name, 'form': form, "cat_list":cat_list}
     return render_to_response( 'rango/add_page.html',
-            {'category_name_url': category_name_url,
-             'category_name': category_name, 'form': form},
-             context)
+            context_dict, context)
 
 def register(request):
 	context = RequestContext(request)
@@ -160,11 +172,13 @@ def register(request):
 		profile_form = UserProfileForm()
 
 	context_dict = {'user_form':user_form, 'profile_form':profile_form, 'registered': registered}
-
+	cat_list = get_category_list()
+	context_dict['cat_list'] = cat_list
 	return render_to_response('rango/register.html', context_dict, context)
 
 def user_login(request):
 	context = RequestContext(request)
+	cat_list = get_category_list()
 
 	if request.method == "POST":
 		username = request.POST['username']
@@ -183,7 +197,7 @@ def user_login(request):
 			return HttpResponse("Invalid login details supplied.")
 
 	else:
-		return render_to_response('rango/login.html', {}, context)
+		return render_to_response('rango/login.html', {"cat_list":cat_list}, context)
 
 @login_required
 def user_logout(request):
@@ -193,7 +207,8 @@ def user_logout(request):
 @login_required
 def restricted(request):
 	context = RequestContext(request)
-	return render_to_response('rango/restricted.html', {}, context)
+	cat_list=get_category_list()
+	return render_to_response('rango/restricted.html', {'cat_list':cat_list}, context)
 
 def search(request):
     context = RequestContext(request)
@@ -205,8 +220,8 @@ def search(request):
         if query:
             # Run our Bing function to get the results list!
             result_list = run_query(query)
-
-    return render_to_response('rango/search.html', {'result_list': result_list}, context)
+    cat_list = get_category_list()
+    return render_to_response('rango/search.html', {'result_list': result_list, 'cat_list':cat_list}, context)
 
 
 
