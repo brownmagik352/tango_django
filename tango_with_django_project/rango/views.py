@@ -25,9 +25,14 @@ def decode_url(str):
 def index(request):
 	context = RequestContext(request)
 
-	cat_list = get_category_list()
-	top_categories = cat_list.order_by('-views')[:5]
+	cat_list = get_category_list() #sidebar
+
+	# top 5 categories and pages by view
+	top_categories = Category.objects.order_by('-views')[:5]
+	for cat in top_categories:
+		cat.url = encode_url(cat.name)
 	page_list = Page.objects.order_by('-views')[:5]
+
 	context_dict = {"cat_list":cat_list, "pages": page_list, "categories":top_categories}
 
 	if request.session.get('last_visit'):
