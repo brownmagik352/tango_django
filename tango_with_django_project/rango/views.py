@@ -1,12 +1,13 @@
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from rango.models import Category, Page
+from rango.models import Category, Page, UserProfile
 from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from datetime import datetime
 from rango.bing_search import run_query
+from django.contrib.auth.models import User
 
 def get_category_list():
     cat_list = Category.objects.all()
@@ -250,6 +251,24 @@ def search(request):
             result_list = run_query(query)
     cat_list = get_category_list()
     return render_to_response('rango/search.html', {'result_list': result_list, 'cat_list':cat_list}, context)
+
+
+@login_required
+def profile(request):
+    context = RequestContext(request)
+    cat_list = get_category_list()
+    context_dict = {'cat_list': cat_list}
+    u = User.objects.get(username=request.user)
+
+    try:
+        up = UserProfile.objects.get(user=u)
+    except:
+        up = None
+
+    context_dict['user'] = u
+    context_dict['userprofile'] = up
+    return render_to_response('rango/profile.html', context_dict, context)
+
 
 
 
